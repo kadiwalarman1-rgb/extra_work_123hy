@@ -294,7 +294,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(14), dp(12), dp(14), dp(12))
-            background = surface
+            setBackgroundColor(surface)
         }
         top.addView(iconButton("‹") { currentChatId = null; renderHome() }, LinearLayout.LayoutParams(dp(42), dp(42)))
         top.addView(avatar(chat.name, chat.avatarColor, 42), LinearLayout.LayoutParams(dp(42), dp(42)).apply { leftMargin = dp(5) })
@@ -333,7 +333,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(10), dp(9), dp(10), dp(9))
-            background = surface
+            setBackgroundColor(surface)
         }
         composeRow.addView(iconButton("＋") { chooseAttachment() }, LinearLayout.LayoutParams(dp(40), dp(44)))
         composer = EditText(this).apply {
@@ -602,7 +602,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(18), dp(12), dp(15), dp(12))
-            background = surface
+            setBackgroundColor(surface)
         }
         bar.addView(avatar("ChatWave", "#6366F1", 44))
         val labels = column(surface)
@@ -620,7 +620,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             setPadding(dp(12), dp(8), dp(12), dp(8))
-            background = surface
+            setBackgroundColor(surface)
         }
         listOf("Chats", "Contacts", "Settings").forEach { name ->
             val button = text(
