@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - ".github/workflows/seed-mirror.yml"
+      - "android-chatwave/**"
 
 permissions:
   contents: write
