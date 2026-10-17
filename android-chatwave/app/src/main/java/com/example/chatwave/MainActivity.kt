@@ -610,8 +610,8 @@ class MainActivity : Activity() {
         labels.addView(text(title, 17f, textColor, true))
         labels.addView(text(subtitle, 10f, muted))
         bar.addView(labels, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        bar.addView(iconButton(firstAction.first, firstAction.second), LinearLayout.LayoutParams(dp(42), dp(42)).apply { rightMargin = dp(3) })
-        bar.addView(iconButton(secondAction.first, secondAction.second), LinearLayout.LayoutParams(dp(42), dp(42)))
+        bar.addView(iconButton(firstAction.first, action = firstAction.second), LinearLayout.LayoutParams(dp(42), dp(42)).apply { rightMargin = dp(3) })
+        bar.addView(iconButton(secondAction.first, action = secondAction.second), LinearLayout.LayoutParams(dp(42), dp(42)))
         return bar
     }
 
