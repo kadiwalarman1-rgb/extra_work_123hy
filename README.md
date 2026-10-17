@@ -2,6 +2,13 @@
 
 A place for reverse-engineering practice and original implementations inspired by observed application behavior.
 
+## Download APKs to your phone
+
+- **[Download Bounce Lab (our original demo app APK)](https://github.com/kadiwalarman1-rgb/extra_work_123hy/releases/download/bounce-lab-v1.0.0/BounceLab-v1.0.0.apk)** — tap or drag to create colorful bouncing bubbles. The build workflow creates this release asset.
+- **[Download the original ApiDemos sample APK](https://github.com/kadiwalarman1-rgb/extra_work_123hy/releases/download/apidemos-sample-v6.0.18/ApiDemos-debug.apk)** — the Appium sample app used during REA analysis.
+
+Or open the [Releases page](https://github.com/kadiwalarman1-rgb/extra_work_123hy/releases) and select the APK under the relevant release's **Assets**.
+
 ## Android project: Bounce Lab
 
 The `android-bounce-lab/` folder contains a small native Kotlin app inspired by the high-level interaction pattern observed in Android's public ApiDemos `BouncingBalls` sample. Tap or drag on the screen to create colorful bubbles that drop, squash, rebound, and fade away.
