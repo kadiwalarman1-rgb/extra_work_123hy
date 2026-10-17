@@ -1,4 +1,4 @@
-name: Publish ApiDemos APK
+name: Build and publish Android APKs
 
 on:
   workflow_dispatch:
@@ -12,20 +12,71 @@ permissions:
   contents: write
 
 jobs:
-  publish-apk:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Download and verify official sample APK
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Download and verify Gradle 8.9
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 3 --output gradle-8.9-bin.zip "https://services.gradle.org/distributions/gradle-8.9-bin.zip"
+          echo "d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab  gradle-8.9-bin.zip" | sha256sum --check --strict
+          unzip -q gradle-8.9-bin.zip
+
+      - name: Build Bounce Lab debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/gradle-8.9/bin/gradle" -p android-bounce-lab assembleDebug --no-daemon
+          cp android-bounce-lab/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/BounceLab-v1.0.0.apk"
+          sha256sum "$RUNNER_TEMP/BounceLab-v1.0.0.apk"
+          stat -c 'Bounce Lab APK size: %s bytes' "$RUNNER_TEMP/BounceLab-v1.0.0.apk"
+
+      - name: Download and verify original ApiDemos sample APK
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 \
-            --output ApiDemos-debug.apk \
+            --output "$RUNNER_TEMP/ApiDemos-debug.apk" \
             "https://github.com/appium/android-apidemos/releases/download/v6.0.18/ApiDemos-debug.apk"
-          echo "a9eecf37b26cd084855c530db81c2bb1b91f4c1b095a04f47aa7c20e2791f686  ApiDemos-debug.apk" | sha256sum --check --strict
-          test "$(stat -c '%s' ApiDemos-debug.apk)" -eq 6521217
+          echo "a9eecf37b26cd084855c530db81c2bb1b91f4c1b095a04f47aa7c20e2791f686  $RUNNER_TEMP/ApiDemos-debug.apk" | sha256sum --check --strict
+          test "$(stat -c '%s' "$RUNNER_TEMP/ApiDemos-debug.apk")" -eq 6521217
 
-      - name: Publish APK as a GitHub Release asset
+      - name: Publish Bounce Lab APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="bounce-lab-v1.0.0"
+          if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$tag" "$RUNNER_TEMP/BounceLab-v1.0.0.apk" --repo "$REPO" --clobber
+          else
+            gh release create "$tag" "$RUNNER_TEMP/BounceLab-v1.0.0.apk" \
+              --repo "$REPO" \
+              --target main \
+              --title "Bounce Lab Android APK v1.0.0" \
+              --notes $'Original Android/Kotlin demo app for testing touch-triggered, colorful bouncing bubbles.\n\nThis is a debug APK built from the source in android-bounce-lab/. Requires Android 8.0 (API 26) or newer.\n\nThis is an original educational implementation inspired by a general animation pattern; it is not the original ApiDemos app.'
+          fi
+
+      - name: Publish original ApiDemos sample APK
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -34,11 +85,11 @@ jobs:
           set -euo pipefail
           tag="apidemos-sample-v6.0.18"
           if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
-            gh release upload "$tag" ApiDemos-debug.apk --repo "$REPO" --clobber
+            gh release upload "$tag" "$RUNNER_TEMP/ApiDemos-debug.apk" --repo "$REPO" --clobber
           else
-            gh release create "$tag" ApiDemos-debug.apk \
+            gh release create "$tag" "$RUNNER_TEMP/ApiDemos-debug.apk" \
               --repo "$REPO" \
               --target main \
               --title "ApiDemos-debug.apk — Android sample" \
-              --notes $'Official Appium Android ApiDemos sample APK for local testing and REA learning.\n\nUpstream release: https://github.com/appium/android-apidemos/releases/tag/v6.0.18\nUpstream project licence: Apache-2.0.\n\nThis is the sample APK used in the analysis, not a newly built clone.'
+              --notes $'Official Appium Android ApiDemos sample APK for local testing and REA learning.\n\nUpstream release: https://github.com/appium/android-apidemos/releases/tag/v6.0.18\nUpstream project licence: Apache-2.0.\n\nThis is the original sample APK used in the analysis, not a newly built clone.'
           fi
