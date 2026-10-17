@@ -1,13 +1,44 @@
-name: Mirror status
+name: Publish ApiDemos APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/seed-mirror.yml"
+
+permissions:
+  contents: write
 
 jobs:
-  status:
+  publish-apk:
     runs-on: ubuntu-latest
     steps:
-      - name: Show manual mirror instructions
+      - name: Download and verify official sample APK
+        shell: bash
         run: |
-          echo "Automatic mirroring could not complete because the connected GitHub App does not have workflow-write permission."
-          echo "Use the upstream repository and push from a local Git client with the required permissions."
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            --output ApiDemos-debug.apk \
+            "https://github.com/appium/android-apidemos/releases/download/v6.0.18/ApiDemos-debug.apk"
+          echo "a9eecf37b26cd084855c530db81c2bb1b91f4c1b095a04f47aa7c20e2791f686  ApiDemos-debug.apk" | sha256sum --check --strict
+          test "$(stat -c '%s' ApiDemos-debug.apk)" -eq 6521217
+
+      - name: Publish APK as a GitHub Release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="apidemos-sample-v6.0.18"
+          if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$tag" ApiDemos-debug.apk --repo "$REPO" --clobber
+          else
+            gh release create "$tag" ApiDemos-debug.apk \
+              --repo "$REPO" \
+              --target main \
+              --title "ApiDemos-debug.apk — Android sample" \
+              --notes $'Official Appium Android ApiDemos sample APK for local testing and REA learning.\n\nUpstream release: https://github.com/appium/android-apidemos/releases/tag/v6.0.18\nUpstream project licence: Apache-2.0.\n\nThis is the sample APK used in the analysis, not a newly built clone.'
+          fi
