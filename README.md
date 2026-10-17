@@ -9,6 +9,14 @@ A place for reverse-engineering practice and original implementations inspired b
 
 Or open the [Releases page](https://github.com/kadiwalarman1-rgb/extra_work_123hy/releases) and select the APK under the relevant release's **Assets**.
 
+- **[Download ChatWave Android APK](https://github.com/kadiwalarman1-rgb/extra_work_123hy/releases/download/chatwave-v1.0.0/ChatWave-v1.0.0.apk)** — original local-device messaging prototype with premium-style demo features enabled.
+
+## Android project: ChatWave
+
+The `android-chatwave/` folder contains a native Kotlin messaging prototype with chat search, local conversations, emoji reactions, pinned chats/messages, dark mode, accent colors, and local attachment selection. The included features do not require an in-app subscription.
+
+**Limitations:** ChatWave is not Telegram and does not unlock Telegram Premium. This prototype stores messages locally; online accounts, remote delivery, cloud sync, voice/video calling, and cloud file uploads require a backend and are not implemented.
+
 ## Android project: Bounce Lab
 
 The `android-bounce-lab/` folder contains a small native Kotlin app inspired by the high-level interaction pattern observed in Android's public ApiDemos `BouncingBalls` sample. Tap or drag on the screen to create colorful bubbles that drop, squash, rebound, and fade away.
