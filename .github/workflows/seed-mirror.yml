@@ -1,25 +1,13 @@
-name: Seed repository from upstream REA
+name: Mirror status
 
 on:
-  push:
-    paths:
-      - ".github/workflows/seed-mirror.yml"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  mirror:
+  status:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone upstream repository and push its branches and tags
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+      - name: Show manual mirror instructions
         run: |
-          set -euo pipefail
-          git clone --bare https://github.com/morluto/rea.git /tmp/rea.git
-          DESTINATION="https://x-access-token:${GH_TOKEN}@github.com/kadiwalarman1-rgb/reverse-engineering-.git"
-          git -C /tmp/rea.git push --force "${DESTINATION}" 'refs/heads/*:refs/heads/*'
-          git -C /tmp/rea.git push --force "${DESTINATION}" 'refs/tags/*:refs/tags/*'
+          echo "Automatic mirroring could not complete because the connected GitHub App does not have workflow-write permission."
+          echo "Use the upstream repository and push from a local Git client with the required permissions."
