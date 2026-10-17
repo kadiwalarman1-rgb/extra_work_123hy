@@ -31,9 +31,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -mindepth 2 -maxdepth 2 -type f -name sdkmanager | head -n 1)"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -mindepth 3 -maxdepth 3 -type f -name sdkmanager | head -n 1)"
           if [ -z "$SDKMANAGER" ]; then
             echo "Android SDK command-line tools were not found on the runner." >&2
+            find "$ANDROID_HOME" -maxdepth 5 -type f -name sdkmanager 2>/dev/null | head -n 10 || true
             exit 1
           fi
           yes | "$SDKMANAGER" --licenses >/dev/null || true
